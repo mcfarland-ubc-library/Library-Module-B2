@@ -16,7 +16,8 @@
   String timestamp = String.valueOf(new Date().getTime()); 
   String nonce = String.valueOf(Math.random() * 100000000);
   String user_id = ctx.getUser().getBatchUid();
-  String signature = sigService.generateSig(consumerKey, signatureMethod, version, user_id, timestamp, nonce);
+  String hash = request.getParameter("hash");
+  String signature = sigService.generateSigWithHash(consumerKey, signatureMethod, version, user_id, timestamp, nonce, hash);
 %>    
 <form method="POST" action="<%= new UBCLibraryServlet().getParam("url") %>" id="theform">
   <input type="hidden" value="<%= consumerKey %>" name="oauth_consumer_key" id="oauth_consumer_key">
@@ -26,7 +27,7 @@
   <input type="hidden" value="<%= version %>" name="oauth_version" id="oauth_version">
   <input type="hidden" value="<%= signature %>" name="oauth_signature" id="oauth_signature">
   <input type="hidden" value="<%= user_id %>" name="user_id" id="user_id">
-  <input type="hidden" value="<%= request.getParameter("hash") %>" name="hash" id="hash">
+  <input type="hidden" value="<%= hash %>" name="hash" id="hash">
 </form>
 
 <script>

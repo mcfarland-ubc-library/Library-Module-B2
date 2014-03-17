@@ -35,4 +35,34 @@ public class UBCLibrarySigService {
 		}
 		return DatatypeConverter.printBase64Binary(digest);
 	}
+
+	public String generateSigWithHash(String consumerKey, String signatureMethod, String version,
+			String user_id, String timestamp, String nonce, String hash) {
+		Mac mac;
+		byte[] digest = null;
+		
+		UBCLibraryDao dao = new UBCLibraryDao();
+		String secretKey = dao.getOption("secret_key");
+		String url = dao.getOption("url");
+		
+		String baseString = "POST&" + url
+		    + "&hash=" + hash
+			+ "&oauth_consumer_key=" + consumerKey 
+			+ "&oauth_nonce=" + nonce
+			+ "&oauth_signature_method=" + signatureMethod
+			+ "&oauth_timestamp=" + timestamp
+			+ "&oauth_version=" + version
+			+ "&user_id=" + user_id;
+		
+		try {
+			baseString = URLEncoder.encode(baseString, "UTF-8");
+			mac = Mac.getInstance("HmacSHA1");
+			SecretKeySpec secret = new SecretKeySpec(secretKey.getBytes(), mac.getAlgorithm());
+			mac.init(secret);
+			digest = mac.doFinal(baseString.getBytes());
+		} catch (Exception e) {
+		}
+		return DatatypeConverter.printBase64Binary(digest);
+	}
+
 }
